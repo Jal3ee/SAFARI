@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { fetchRequests } from '../api';
-import { Loader2, Search } from 'lucide-react';
+import { Loader2, Search, Lock } from 'lucide-react';
 
 const Admin = () => {
+  const [passcode, setPasscode] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   
@@ -16,18 +20,28 @@ const Admin = () => {
   });
 
   useEffect(() => {
-    const loadRequests = async () => {
-      try {
-        const data = await fetchRequests();
-        setRequests(data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)));
-      } catch (error) {
-        console.error('Failed to load history', error);
-      } finally {
-        setLoading(false);
-      }
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
     };
-    loadRequests();
-  }, []);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    if (isAuthenticated) {
+      const loadRequests = async () => {
+        try {
+          const data = await fetchRequests();
+          setRequests(data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)));
+        } catch (error) {
+          console.error('Failed to load history', error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      loadRequests();
+    }
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, [isAuthenticated]);
 
   const handleFilterChange = (column, value) => {
     setFilters(prev => ({ ...prev, [column]: value }));
@@ -42,6 +56,46 @@ const Admin = () => {
       (filters.arrivalDate === '' || req.arrivalDate?.includes(filters.arrivalDate))
     );
   });
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (passcode === 'admin123') { // Simple passcode
+      setIsAuthenticated(true);
+    } else {
+      alert('Passcode salah!');
+    }
+  };
+
+  if (isMobile) {
+    return (
+      <div className="glass-card" style={{ textAlign: 'center', padding: '3rem' }}>
+        <h2>Akses Ditolak</h2>
+        <p>Panel Admin hanya dapat diakses melalui perangkat Desktop / Laptop.</p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="glass-card" style={{ maxWidth: '400px', margin: '4rem auto', textAlign: 'center' }}>
+        <div className="modal-icon" style={{ background: '#e0e7ff', color: '#4338ca' }}>
+          <Lock size={32} />
+        </div>
+        <h2>Admin Login</h2>
+        <p>Masukkan passcode untuk masuk ke Panel Admin.</p>
+        <form onSubmit={handleLogin} style={{ marginTop: '1.5rem' }}>
+          <input 
+            type="password" 
+            placeholder="Passcode" 
+            value={passcode} 
+            onChange={(e) => setPasscode(e.target.value)} 
+            style={{ marginBottom: '1rem', textAlign: 'center', letterSpacing: '0.2rem' }}
+          />
+          <button type="submit" className="btn btn-primary btn-full">Login</button>
+        </form>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

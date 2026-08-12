@@ -24,7 +24,8 @@ const SuccessModal = ({ requestId, onClose }) => (
         <CheckCircle size={32} />
       </div>
       <h2>Request Terkirim!</h2>
-      <p>Data Anda berhasil disimpan. Harap catat ID Request Anda untuk mengecek status di halaman History:</p>
+      <p>Data pengajuan Anda berhasil disimpan. <strong>Harap catat ID Request Anda di bawah ini!</strong></p>
+      <p style={{ fontSize: '0.9rem', color: 'var(--text-light)', marginTop: '0.5rem' }}>Gunakan ID ini pada menu <strong>History</strong> untuk melacak status persetujuan pengajuan Anda sewaktu-waktu.</p>
       <div style={{ background: '#f1f5f9', padding: '1rem', borderRadius: '8px', fontSize: '1.25rem', fontWeight: 'bold', letterSpacing: '2px', color: 'var(--primary-color)', margin: '1.5rem 0' }}>
         {requestId}
       </div>
@@ -107,26 +108,33 @@ const NewRequest = () => {
   };
 
   const validateForm = () => {
-    if (isAGM === null) return "Harap pilih apakah Anda Karyawan AGM";
-    if (isAGM && !nik) return "Harap masukkan NIK";
-    if (!nama || !perusahaan || !departement) return "Harap lengkapi Data Diri";
-    if (!arrivalDate || !departureDate || !purpose) return "Harap lengkapi Visit Information";
-    if (needsMess === null) return "Harap pilih apakah memerlukan Mess";
+    if (isAGM === null) return { msg: "Harap pilih apakah Anda Karyawan AGM", id: "field-isAGM" };
+    if (isAGM && !nik) return { msg: "Harap masukkan NIK", id: "field-nik" };
+    if (!nama || !perusahaan || !departement) return { msg: "Harap lengkapi Data Diri", id: "field-nama" };
+    if (!arrivalDate) return { msg: "Harap isi Arrival Date", id: "field-arrivalDate" };
+    if (!departureDate) return { msg: "Harap isi Departure Date", id: "field-departureDate" };
+    if (!purpose) return { msg: "Harap isi Purpose of Visit", id: "field-purpose" };
+    if (needsMess === null) return { msg: "Harap pilih apakah memerlukan Mess", id: "field-needsMess" };
     if (needsMess) {
       if (messDetails.laundry === null || messDetails.meals === null || messDetails.amenities === null) {
-        return "Harap lengkapi opsi Kebutuhan Fasilitas Mess";
+        return { msg: "Harap lengkapi opsi Kebutuhan Fasilitas Mess", id: "field-messDetails" };
       }
     }
-    if (safety.shoes && !safety.shoesSize) return "Harap masukkan ukuran Safety Shoes";
+    if (safety.shoes && !safety.shoesSize) return { msg: "Harap masukkan ukuran Safety Shoes", id: "field-shoesSize" };
     return null;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    const errorMsg = validateForm();
-    if (errorMsg) {
-      showToast(errorMsg);
+    const error = validateForm();
+    if (error) {
+      showToast(error.msg);
+      const el = document.getElementById(error.id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.focus();
+      }
       return;
     }
 
@@ -184,7 +192,7 @@ const NewRequest = () => {
         {/* Section 1: Identitas */}
         <div className="glass-card" style={{ background: 'rgba(255,255,255,0.4)', borderColor: 'rgba(255,255,255,0.9)' }}>
           <h3>1. Informasi Identitas</h3>
-          <div className="form-group">
+          <div className="form-group" id="field-isAGM">
             <label>Apakah Anda Karyawan AGM?</label>
             <div className="radio-group">
               <label className="radio-label">
@@ -202,6 +210,7 @@ const NewRequest = () => {
               <div style={{ display: 'flex', gap: '0.75rem' }}>
                 <input 
                   type="text" 
+                  id="field-nik"
                   value={nik} 
                   onChange={(e) => setNik(e.target.value)} 
                   placeholder="Masukkan NIK" 
@@ -215,15 +224,15 @@ const NewRequest = () => {
 
           {(isAGM !== null) && (
             <>
-              <div className="form-group">
+              <div className="form-group" id="field-nama">
                 <label>Nama Lengkap</label>
                 <input type="text" value={nama} onChange={(e) => setNama(e.target.value)} readOnly={isAGM} placeholder="Masukkan Nama Lengkap" />
               </div>
-              <div className="form-group">
+              <div className="form-group" id="field-perusahaan">
                 <label>Perusahaan</label>
                 <input type="text" value={perusahaan} onChange={(e) => setPerusahaan(e.target.value)} readOnly={isAGM} placeholder="Masukkan Nama Perusahaan" />
               </div>
-              <div className="form-group">
+              <div className="form-group" id="field-departement">
                 <label>Departement</label>
                 <input type="text" value={departement} onChange={(e) => setDepartement(e.target.value)} readOnly={isAGM} placeholder="Masukkan Nama Departement" />
               </div>
@@ -237,16 +246,16 @@ const NewRequest = () => {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1rem' }}>
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label>Arrival Date</label>
-              <input type="date" value={arrivalDate} onChange={(e) => setArrivalDate(e.target.value)} />
+              <input type="date" id="field-arrivalDate" value={arrivalDate} onChange={(e) => setArrivalDate(e.target.value)} />
             </div>
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label>Departure Date</label>
-              <input type="date" value={departureDate} onChange={(e) => setDepartureDate(e.target.value)} />
+              <input type="date" id="field-departureDate" value={departureDate} onChange={(e) => setDepartureDate(e.target.value)} />
             </div>
           </div>
           <div className="form-group">
             <label>Purpose of Visit</label>
-            <textarea value={purpose} onChange={(e) => setPurpose(e.target.value)} rows="3" placeholder="Jelaskan tujuan kunjungan Anda"></textarea>
+            <textarea id="field-purpose" value={purpose} onChange={(e) => setPurpose(e.target.value)} rows="3" placeholder="Jelaskan tujuan kunjungan Anda"></textarea>
           </div>
         </div>
 
@@ -304,7 +313,7 @@ const NewRequest = () => {
             </label>
             {safety.shoes && (
               <div className="checkbox-body">
-                <input type="number" placeholder="Ukuran Sepatu (Size)" value={safety.shoesSize} onChange={(e) => setSafety({...safety, shoesSize: e.target.value})} />
+                <input type="number" id="field-shoesSize" placeholder="Ukuran Sepatu (Size)" value={safety.shoesSize} onChange={(e) => setSafety({...safety, shoesSize: e.target.value})} />
               </div>
             )}
           </div>
@@ -325,7 +334,7 @@ const NewRequest = () => {
         {/* Section 5: Akomodasi */}
         <div className="glass-card" style={{ background: 'rgba(255,255,255,0.4)', borderColor: 'rgba(255,255,255,0.9)' }}>
           <h3>5. Kebutuhan Fasilitas Mess</h3>
-          <div className="form-group">
+          <div className="form-group" id="field-needsMess">
             <label>Apakah Anda memerlukan Mess?</label>
             <div className="radio-group">
               <label className="radio-label">
@@ -338,7 +347,7 @@ const NewRequest = () => {
           </div>
 
           {needsMess === true && (
-            <div style={{ paddingLeft: '1.5rem', borderLeft: '4px solid var(--primary-color)', marginTop: '1.5rem' }}>
+            <div id="field-messDetails" style={{ paddingLeft: '1.5rem', borderLeft: '4px solid var(--primary-color)', marginTop: '1.5rem' }}>
               <div className="form-group">
                 <label>Laundry Services</label>
                 <div className="radio-group">

@@ -23,7 +23,6 @@ const Navbar = () => {
           <>
             <Link to="/" className={location.pathname === '/' ? 'active' : ''}>New Request</Link>
             <Link to="/history" className={location.pathname === '/history' ? 'active' : ''}>History</Link>
-            <Link to="/admin" style={{ marginLeft: '2rem', fontSize: '0.85rem' }}>Admin Panel</Link>
           </>
         )}
       </nav>
