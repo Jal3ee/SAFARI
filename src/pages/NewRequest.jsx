@@ -17,22 +17,38 @@ const Toast = ({ message, type, onClose }) => {
   );
 };
 
-const SuccessModal = ({ requestId, onClose }) => (
-  <div className="modal-overlay">
-    <div className="modal-content">
-      <div className="modal-icon">
-        <CheckCircle size={32} />
+const SuccessModal = ({ requestId, onClose }) => {
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-content">
+        <div className="modal-icon">
+          <CheckCircle size={32} />
+        </div>
+        <h2>Request Terkirim!</h2>
+        <p>Data pengajuan Anda berhasil disimpan. <strong>Harap catat ID Request Anda di bawah ini!</strong></p>
+        
+        <div style={{ background: '#f1f5f9', padding: '1rem', borderRadius: '8px', fontSize: '1.25rem', fontWeight: 'bold', letterSpacing: '2px', color: 'var(--primary-color)', margin: '1.5rem 0' }}>
+          {requestId}
+        </div>
+        
+        <div style={{ background: 'rgba(59, 130, 246, 0.1)', padding: '1rem', borderRadius: '8px', textAlign: 'left', marginBottom: '1.5rem', borderLeft: '4px solid var(--primary-color)' }}>
+          <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-dark)', lineHeight: '1.5' }}>
+            <strong>Cara menggunakan ID Anda:</strong><br/>
+            Masuk ke menu <strong>History</strong> (ikon jam) dan masukkan ID di atas untuk:<br/>
+            ✅ Melihat status persetujuan (Pending / Approved / Rejected).<br/>
+            ✅ Mengecek kembali detail pengajuan dan fasilitas Anda.
+          </p>
+        </div>
+
+        <button className="btn btn-primary btn-full" onClick={onClose}>Lihat History</button>
       </div>
-      <h2>Request Terkirim!</h2>
-      <p>Data pengajuan Anda berhasil disimpan. <strong>Harap catat ID Request Anda di bawah ini!</strong></p>
-      <p style={{ fontSize: '0.9rem', color: 'var(--text-light)', marginTop: '0.5rem' }}>Gunakan ID ini pada menu <strong>History</strong> untuk melacak status persetujuan pengajuan Anda sewaktu-waktu.</p>
-      <div style={{ background: '#f1f5f9', padding: '1rem', borderRadius: '8px', fontSize: '1.25rem', fontWeight: 'bold', letterSpacing: '2px', color: 'var(--primary-color)', margin: '1.5rem 0' }}>
-        {requestId}
-      </div>
-      <button className="btn btn-primary btn-full" onClick={onClose}>Lihat History</button>
     </div>
-  </div>
-);
+  );
+};
 
 const NewRequest = () => {
   const navigate = useNavigate();

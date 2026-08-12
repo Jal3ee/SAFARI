@@ -21,25 +21,25 @@ const DetailModal = ({ request, onClose, onStatusUpdate }) => {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content" style={{ maxWidth: '600px', textAlign: 'left', maxHeight: '90vh', overflowY: 'auto' }}>
+      <div className="modal-content" style={{ maxWidth: '800px', textAlign: 'left', maxHeight: '85vh', overflowY: 'auto', padding: '2.5rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid #eee', paddingBottom: '1rem' }}>
-          <h2 style={{ margin: 0 }}>Detail Request: {request.id}</h2>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X /></button>
+          <h2 style={{ margin: 0, fontSize: '1.5rem', color: 'var(--primary-color)' }}>Detail Request: {request.id}</h2>
+          <button onClick={onClose} style={{ background: 'var(--gray-light)', border: 'none', cursor: 'pointer', padding: '0.5rem', borderRadius: '50%', display: 'flex' }}><X size={20} /></button>
         </div>
         
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
-          <div><strong>NIK:</strong> {request.nik}</div>
-          <div><strong>Karyawan AGM:</strong> {request.isAGM ? 'Ya' : 'Tidak'}</div>
-          <div><strong>Nama:</strong> {request.nama}</div>
-          <div><strong>Perusahaan:</strong> {request.perusahaan}</div>
-          <div><strong>Departemen:</strong> {request.departement}</div>
-          <div><strong>Arrival Date:</strong> {request.arrivalDate}</div>
-          <div><strong>Departure Date:</strong> {request.departureDate}</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem', marginBottom: '2rem', fontSize: '1.05rem' }}>
+          <div><strong style={{ color: 'var(--text-light)' }}>NIK:</strong><br/>{request.nik}</div>
+          <div><strong style={{ color: 'var(--text-light)' }}>Karyawan AGM:</strong><br/>{request.isAGM ? 'Ya' : 'Tidak'}</div>
+          <div><strong style={{ color: 'var(--text-light)' }}>Nama:</strong><br/>{request.nama}</div>
+          <div><strong style={{ color: 'var(--text-light)' }}>Perusahaan:</strong><br/>{request.perusahaan}</div>
+          <div><strong style={{ color: 'var(--text-light)' }}>Departemen:</strong><br/>{request.departement}</div>
+          <div><strong style={{ color: 'var(--text-light)' }}>Arrival Date:</strong><br/>{new Date(request.arrivalDate).toLocaleDateString()}</div>
+          <div><strong style={{ color: 'var(--text-light)' }}>Departure Date:</strong><br/>{new Date(request.departureDate).toLocaleDateString()}</div>
         </div>
 
-        <div style={{ marginBottom: '1.5rem' }}>
-          <strong>Tujuan:</strong>
-          <p style={{ marginTop: '0.25rem' }}>{request.purpose}</p>
+        <div style={{ marginBottom: '2rem', fontSize: '1.05rem' }}>
+          <strong style={{ color: 'var(--text-light)' }}>Tujuan:</strong>
+          <p style={{ marginTop: '0.5rem', background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>{request.purpose}</p>
         </div>
 
         <div style={{ marginBottom: '1.5rem', background: '#f8fafc', padding: '1rem', borderRadius: '8px' }}>
