@@ -10,7 +10,14 @@ export const saveRequest = async (data) => {
       method: 'POST',
       body: JSON.stringify(data)
     });
-    return await response.json();
+    
+    const text = await response.text();
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      console.error("GAS Error HTML:", text);
+      throw new Error("Terjadi error di Google Script (Mungkin nama Sheet salah atau Google Multi-login issue). Coba gunakan Incognito Window.");
+    }
   } catch (error) {
     console.error('Error saving request:', error);
     throw error;
