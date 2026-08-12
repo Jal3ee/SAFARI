@@ -22,9 +22,19 @@ export const saveRequest = async (data) => {
           departure_date: data.departureDate,
           purpose: data.purpose,
           transport_airport: data.transport?.airport || false,
+          transport_airport_note: data.transport?.airportNote || null,
           transport_site: data.transport?.site || false,
+          transport_site_note: data.transport?.siteNote || null,
           transport_return: data.transport?.returnTransport || false,
+          transport_return_note: data.transport?.returnNote || null,
+          safety_shoes: data.safety?.shoes || false,
+          safety_shoes_size: data.safety?.shoesSize || null,
+          safety_vest: data.safety?.vest || false,
+          safety_helm: data.safety?.helm || false,
           needs_mess: data.needsMess || false,
+          mess_laundry: data.messDetails?.laundry ?? null,
+          mess_meals: data.messDetails?.meals ?? null,
+          mess_amenities: data.messDetails?.amenities ?? null,
           status: 'Pending'
         }
       ])
@@ -37,6 +47,24 @@ export const saveRequest = async (data) => {
   } catch (error) {
     console.error('Error saving request:', error);
     throw new Error('Terjadi error saat menyimpan data ke database. Silakan coba lagi.');
+  }
+};
+
+/**
+ * Updates request status
+ */
+export const updateRequestStatus = async (id, newStatus) => {
+  try {
+    const { error } = await supabase
+      .from('requests')
+      .update({ status: newStatus })
+      .eq('id', id);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating status:', error);
+    throw new Error('Gagal memperbarui status');
   }
 };
 
@@ -67,10 +95,24 @@ export const fetchRequests = async () => {
       purpose: req.purpose,
       transport: {
         airport: req.transport_airport,
+        airportNote: req.transport_airport_note,
         site: req.transport_site,
-        returnTransport: req.transport_return
+        siteNote: req.transport_site_note,
+        returnTransport: req.transport_return,
+        returnNote: req.transport_return_note
       },
-      needsMess: req.needs_mess
+      safety: {
+        shoes: req.safety_shoes,
+        shoesSize: req.safety_shoes_size,
+        vest: req.safety_vest,
+        helm: req.safety_helm
+      },
+      needsMess: req.needs_mess,
+      messDetails: {
+        laundry: req.mess_laundry,
+        meals: req.mess_meals,
+        amenities: req.mess_amenities
+      }
     }));
   } catch (error) {
     console.error('Error fetching requests:', error);
@@ -109,10 +151,24 @@ export const fetchRequestById = async (id) => {
       purpose: data.purpose,
       transport: {
         airport: data.transport_airport,
+        airportNote: data.transport_airport_note,
         site: data.transport_site,
-        returnTransport: data.transport_return
+        siteNote: data.transport_site_note,
+        returnTransport: data.transport_return,
+        returnNote: data.transport_return_note
       },
-      needsMess: data.needs_mess
+      safety: {
+        shoes: data.safety_shoes,
+        shoesSize: data.safety_shoes_size,
+        vest: data.safety_vest,
+        helm: data.safety_helm
+      },
+      needsMess: data.needs_mess,
+      messDetails: {
+        laundry: data.mess_laundry,
+        meals: data.mess_meals,
+        amenities: data.mess_amenities
+      }
     };
   } catch (error) {
     console.error('Error fetching request by ID:', error);

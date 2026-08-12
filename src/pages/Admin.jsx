@@ -1,7 +1,91 @@
 import React, { useState, useEffect } from 'react';
-import { fetchRequests } from '../api';
-import { Loader2, Search, Lock, Download } from 'lucide-react';
+import { fetchRequests, updateRequestStatus } from '../api';
+import { Loader2, Search, Lock, Download, Eye, X } from 'lucide-react';
 import * as XLSX from 'xlsx';
+
+const DetailModal = ({ request, onClose, onStatusUpdate }) => {
+  const [updating, setUpdating] = useState(false);
+  const [status, setStatus] = useState(request.status);
+
+  const handleUpdate = async () => {
+    setUpdating(true);
+    try {
+      await updateRequestStatus(request.id, status);
+      onStatusUpdate(request.id, status);
+    } catch (e) {
+      alert("Failed to update status");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-content" style={{ maxWidth: '600px', textAlign: 'left', maxHeight: '90vh', overflowY: 'auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid #eee', paddingBottom: '1rem' }}>
+          <h2 style={{ margin: 0 }}>Detail Request: {request.id}</h2>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X /></button>
+        </div>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+          <div><strong>NIK:</strong> {request.nik}</div>
+          <div><strong>Karyawan AGM:</strong> {request.isAGM ? 'Ya' : 'Tidak'}</div>
+          <div><strong>Nama:</strong> {request.nama}</div>
+          <div><strong>Perusahaan:</strong> {request.perusahaan}</div>
+          <div><strong>Departemen:</strong> {request.departement}</div>
+          <div><strong>Arrival Date:</strong> {request.arrivalDate}</div>
+          <div><strong>Departure Date:</strong> {request.departureDate}</div>
+        </div>
+
+        <div style={{ marginBottom: '1.5rem' }}>
+          <strong>Tujuan:</strong>
+          <p style={{ marginTop: '0.25rem' }}>{request.purpose}</p>
+        </div>
+
+        <div style={{ marginBottom: '1.5rem', background: '#f8fafc', padding: '1rem', borderRadius: '8px' }}>
+          <h4 style={{ marginBottom: '0.5rem' }}>Transportasi</h4>
+          {request.transport?.airport && <div>- Airport Pickup ({request.transport.airportNote || '-'})</div>}
+          {request.transport?.site && <div>- Site Transport ({request.transport.siteNote || '-'})</div>}
+          {request.transport?.returnTransport && <div>- Return Transport ({request.transport.returnNote || '-'})</div>}
+          {!request.transport?.airport && !request.transport?.site && !request.transport?.returnTransport && <div>Tidak ada</div>}
+        </div>
+
+        <div style={{ marginBottom: '1.5rem', background: '#f8fafc', padding: '1rem', borderRadius: '8px' }}>
+          <h4 style={{ marginBottom: '0.5rem' }}>Safety (PPE)</h4>
+          {request.safety?.shoes && <div>- Safety Shoes (Size: {request.safety.shoesSize || '-'})</div>}
+          {request.safety?.vest && <div>- Safety Vest</div>}
+          {request.safety?.helm && <div>- Safety Helmet</div>}
+          {!request.safety?.shoes && !request.safety?.vest && !request.safety?.helm && <div>Tidak ada</div>}
+        </div>
+
+        <div style={{ marginBottom: '1.5rem', background: '#f8fafc', padding: '1rem', borderRadius: '8px' }}>
+          <h4 style={{ marginBottom: '0.5rem' }}>Akomodasi Mess</h4>
+          {request.needsMess ? (
+            <>
+              <div>- Laundry: {request.messDetails?.laundry ? 'Ya' : 'Tidak'}</div>
+              <div>- Meals: {request.messDetails?.meals ? 'Ya' : 'Tidak'}</div>
+              <div>- Amenities: {request.messDetails?.amenities ? 'Ya' : 'Tidak'}</div>
+            </>
+          ) : (
+            <div>Tidak memerlukan mess</div>
+          )}
+        </div>
+
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginTop: '2rem', borderTop: '1px solid #eee', paddingTop: '1.5rem' }}>
+          <strong>Update Status:</strong>
+          <select value={status} onChange={(e) => setStatus(e.target.value)} style={{ flex: 1, padding: '0.5rem' }}>
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+          <button className="btn btn-primary" onClick={handleUpdate} disabled={updating}>
+            {updating ? 'Updating...' : 'Simpan Status'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const Admin = () => {
   const [passcode, setPasscode] = useState('');
@@ -10,6 +94,7 @@ const Admin = () => {
   
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedRequest, setSelectedRequest] = useState(null);
   
   // Filters state (one for each column)
   const [filters, setFilters] = useState({
@@ -57,6 +142,11 @@ const Admin = () => {
       (filters.arrivalDate === '' || req.arrivalDate?.includes(filters.arrivalDate))
     );
   });
+
+  const handleStatusUpdate = (id, newStatus) => {
+    setRequests(prev => prev.map(req => req.id === id ? { ...req, status: newStatus } : req));
+    setSelectedRequest(null);
+  };
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -184,6 +274,7 @@ const Admin = () => {
                   </select>
                 </div>
               </th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -207,20 +298,33 @@ const Admin = () => {
                     {req.needsMess ? 'Yes' : 'No'}
                   </td>
                   <td>
-                    <span className={`badge ${req.status === 'Approved' ? 'badge-green' : 'badge-blue'}`}>
+                    <span className={`badge ${req.status === 'Approved' ? 'badge-green' : req.status === 'Rejected' ? 'badge-red' : 'badge-blue'}`}>
                       {req.status || 'Pending'}
                     </span>
+                  </td>
+                  <td>
+                    <button className="btn btn-secondary" onClick={() => setSelectedRequest(req)} style={{ padding: '0.35rem 0.75rem', fontSize: '0.85rem' }}>
+                      <Eye size={16} /> Detail
+                    </button>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="7" style={{ textAlign: 'center', padding: '2rem' }}>No requests found matching criteria</td>
+                <td colSpan="8" style={{ textAlign: 'center', padding: '2rem' }}>No requests found matching criteria</td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
+
+      {selectedRequest && (
+        <DetailModal 
+          request={selectedRequest} 
+          onClose={() => setSelectedRequest(null)} 
+          onStatusUpdate={handleStatusUpdate}
+        />
+      )}
     </div>
   );
 };
