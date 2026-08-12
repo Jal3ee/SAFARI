@@ -5,10 +5,14 @@ import { supabase } from './supabaseClient';
  */
 export const saveRequest = async (data) => {
   try {
+    // Generate a short 6-character alphanumeric ID (e.g. REQ-A4B8X9)
+    const shortId = 'REQ-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
     const { data: result, error } = await supabase
       .from('requests')
       .insert([
         {
+          id: shortId,
           is_agm: data.isAGM,
           nik: data.nik || null,
           nama: data.nama,
