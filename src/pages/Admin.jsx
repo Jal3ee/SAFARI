@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchRequests } from '../api';
-import { Loader2, Search, Lock } from 'lucide-react';
+import { Loader2, Search, Lock, Download } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 const Admin = () => {
   const [passcode, setPasscode] = useState('');
@@ -66,6 +67,31 @@ const Admin = () => {
     }
   };
 
+  const handleExportExcel = () => {
+    const excelData = filteredRequests.map(req => ({
+      'ID Request': req.id,
+      'Status': req.status,
+      'Karyawan AGM': req.isAGM ? 'Ya' : 'Tidak',
+      'NIK': req.nik,
+      'Nama': req.nama,
+      'Perusahaan': req.perusahaan,
+      'Departemen': req.departement,
+      'Tgl Datang': req.arrivalDate,
+      'Tgl Pulang': req.departureDate,
+      'Tujuan': req.purpose,
+      'Airport Pickup': req.transport?.airport ? 'Ya' : 'Tidak',
+      'Site Transport': req.transport?.site ? 'Ya' : 'Tidak',
+      'Return Transport': req.transport?.returnTransport ? 'Ya' : 'Tidak',
+      'Butuh Mess': req.needsMess ? 'Ya' : 'Tidak'
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Requests");
+    
+    XLSX.writeFile(workbook, "Data_SAFARI.xlsx");
+  };
+
   if (isMobile) {
     return (
       <div className="glass-card" style={{ textAlign: 'center', padding: '3rem' }}>
@@ -108,8 +134,15 @@ const Admin = () => {
 
   return (
     <div className="glass-card">
-      <h2>All Requests (Admin Panel)</h2>
-      <p>Manage and filter all SAFARI requests</p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+        <div>
+          <h2 style={{ margin: 0 }}>All Requests (Admin Panel)</h2>
+          <p style={{ margin: 0 }}>Manage and filter all SAFARI requests</p>
+        </div>
+        <button className="btn btn-secondary" onClick={handleExportExcel} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Download size={18} /> Export Excel
+        </button>
+      </div>
       
       <div className="table-container">
         <table>
