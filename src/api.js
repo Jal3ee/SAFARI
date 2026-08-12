@@ -1,12 +1,13 @@
-// Update with the exact URL provided by user
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzZD7pj6pJ-86F6w9-JyYqdD4gS5C6Zv0qijGazdbdHNbBYREYZNnWp29-U6i84CgwYeQ/exec';
+// Proxy endpoint that routes to Google Apps Script
+// Solves CORS and Multi-login issues
+const API_URL = '/api/gas';
 
 /**
  * Saves a new request to GAS.
  */
 export const saveRequest = async (data) => {
   try {
-    const response = await fetch(GAS_URL, {
+    const response = await fetch(API_URL, {
       method: 'POST',
       body: JSON.stringify(data)
     });
@@ -15,8 +16,8 @@ export const saveRequest = async (data) => {
     try {
       return JSON.parse(text);
     } catch (e) {
-      console.error("GAS Error HTML:", text);
-      throw new Error("Terjadi error di Google Script (Mungkin nama Sheet salah atau Google Multi-login issue). Coba gunakan Incognito Window.");
+      console.error("Server Error HTML:", text);
+      throw new Error("Terjadi error di server. Silakan coba lagi.");
     }
   } catch (error) {
     console.error('Error saving request:', error);
@@ -29,7 +30,7 @@ export const saveRequest = async (data) => {
  */
 export const fetchRequests = async () => {
   try {
-    const response = await fetch(`${GAS_URL}?action=get_all`);
+    const response = await fetch(`${API_URL}?action=get_all`);
     return await response.json();
   } catch (error) {
     console.error('Error fetching requests:', error);
@@ -42,7 +43,7 @@ export const fetchRequests = async () => {
  */
 export const fetchRequestById = async (id) => {
   try {
-    const response = await fetch(`${GAS_URL}?action=get_request&id=${id}`);
+    const response = await fetch(`${API_URL}?action=get_request&id=${id}`);
     const data = await response.json();
     if (data.status === 'error') {
       throw new Error(data.message);
@@ -59,7 +60,7 @@ export const fetchRequestById = async (id) => {
  */
 export const verifyNIK = async (nik) => {
   try {
-    const response = await fetch(`${GAS_URL}?action=verify_nik&nik=${nik}`);
+    const response = await fetch(`${API_URL}?action=verify_nik&nik=${nik}`);
     const data = await response.json();
     return data;
   } catch (error) {

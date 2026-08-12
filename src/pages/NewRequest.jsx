@@ -43,6 +43,8 @@ const NewRequest = () => {
   const [toast, setToast] = useState(null); // { message, type }
   const [successId, setSuccessId] = useState(null);
   
+  const [isManualAllowed, setIsManualAllowed] = useState(false);
+  
   // Form State
   const [isAGM, setIsAGM] = useState(null);
   const [nik, setNik] = useState('');
@@ -95,10 +97,12 @@ const NewRequest = () => {
         setNama(res.data.nama);
         setPerusahaan(res.data.perusahaan);
         setDepartement(res.data.departement);
+        setIsManualAllowed(false);
         showToast('Data Karyawan ditemukan', 'success');
       } else {
-        showToast(res.message || 'NIK tidak ditemukan');
+        showToast(res.message || 'NIK tidak ditemukan. Silakan isi data secara manual.');
         setNama(''); setPerusahaan(''); setDepartement('');
+        setIsManualAllowed(true);
       }
     } catch (err) {
       showToast('Gagal memverifikasi NIK. Pastikan GAS URL sudah benar.');
@@ -196,10 +200,10 @@ const NewRequest = () => {
             <label>Apakah Anda Karyawan AGM?</label>
             <div className="radio-group">
               <label className="radio-label">
-                <input type="radio" name="isAGM" checked={isAGM === true} onChange={() => { setIsAGM(true); setNama(''); setPerusahaan(''); setDepartement(''); }} /> Yes
+                <input type="radio" name="isAGM" checked={isAGM === true} onChange={() => { setIsAGM(true); setNama(''); setPerusahaan(''); setDepartement(''); setIsManualAllowed(false); }} /> Yes
               </label>
               <label className="radio-label">
-                <input type="radio" name="isAGM" checked={isAGM === false} onChange={() => { setIsAGM(false); setNik(''); setNama(''); setPerusahaan(''); setDepartement(''); }} /> No
+                <input type="radio" name="isAGM" checked={isAGM === false} onChange={() => { setIsAGM(false); setNik(''); setNama(''); setPerusahaan(''); setDepartement(''); setIsManualAllowed(true); }} /> No
               </label>
             </div>
           </div>
@@ -226,15 +230,15 @@ const NewRequest = () => {
             <>
               <div className="form-group" id="field-nama">
                 <label>Nama Lengkap</label>
-                <input type="text" value={nama} onChange={(e) => setNama(e.target.value)} readOnly={isAGM} placeholder="Masukkan Nama Lengkap" />
+                <input type="text" value={nama} onChange={(e) => setNama(e.target.value)} readOnly={isAGM && !isManualAllowed} placeholder="Masukkan Nama Lengkap" />
               </div>
               <div className="form-group" id="field-perusahaan">
                 <label>Perusahaan</label>
-                <input type="text" value={perusahaan} onChange={(e) => setPerusahaan(e.target.value)} readOnly={isAGM} placeholder="Masukkan Nama Perusahaan" />
+                <input type="text" value={perusahaan} onChange={(e) => setPerusahaan(e.target.value)} readOnly={isAGM && !isManualAllowed} placeholder="Masukkan Nama Perusahaan" />
               </div>
               <div className="form-group" id="field-departement">
                 <label>Departement</label>
-                <input type="text" value={departement} onChange={(e) => setDepartement(e.target.value)} readOnly={isAGM} placeholder="Masukkan Nama Departement" />
+                <input type="text" value={departement} onChange={(e) => setDepartement(e.target.value)} readOnly={isAGM && !isManualAllowed} placeholder="Masukkan Nama Departement" />
               </div>
             </>
           )}
