@@ -9,7 +9,7 @@ export const saveRequest = async (data) => {
     const response = await fetch(GAS_URL, {
       method: 'POST',
       body: JSON.stringify(data),
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }
     });
     return await response.json();
   } catch (error) {
