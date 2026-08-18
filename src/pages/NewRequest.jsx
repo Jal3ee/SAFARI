@@ -224,23 +224,25 @@ const NewRequest = () => {
       if (res.status === 'success') {
         setSuccessId(res.id);
 
-        try {
-          const templateParams = {
+          const emailPayload = {
+            request_id: res.id,
             to_email: email,
             cc_email: 'm_haykal@baramultigroup.co.id',
-            request_id: res.id,
-            user_name: nama,
-            company: perusahaan
+            nama: nama,
+            perusahaan: perusahaan,
+            purpose: purpose,
+            arrival_date: arrivalDate,
+            departure_date: departureDate
           };
-          await emailjs.send(
-            import.meta.env.VITE_EMAILJS_SERVICE_ID, 
-            import.meta.env.VITE_EMAILJS_TEMPLATE_ID, 
-            templateParams, 
-            import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-          );
-        } catch (emailErr) {
-          console.error("Gagal mengirim email:", emailErr);
-        }
+
+          fetch('https://script.google.com/macros/s/AKfycbzQV8OSoRGc1TYUbWq1s7oNnXBxDitLEMAoqPtMHGRz_Bhf1u_GMj0lZerU9VwqSv_h/exec', {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(emailPayload)
+          }).catch(err => console.error("Error trigger GAS:", err));
       } else {
         showToast('Gagal menyimpan: ' + (res.message || 'Unknown error'));
       }
