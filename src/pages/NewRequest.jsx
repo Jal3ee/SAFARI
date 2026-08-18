@@ -377,20 +377,38 @@ const NewRequest = () => {
             </label>
             {transport.airport && (
               <div className="checkbox-body" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div>
-                  <strong style={{ fontSize: '0.9rem' }}>Arrival</strong>
-                  <div className="grid-3" style={{ marginTop: '0.5rem' }}>
-                    <input type="date" value={transport.airportArrivalDate} onChange={(e) => setTransport({...transport, airportArrivalDate: e.target.value})} title="Tanggal" />
-                    <input type="text" placeholder="Bandara" value={transport.airportArrivalAirport} onChange={(e) => setTransport({...transport, airportArrivalAirport: e.target.value})} />
-                    <input type="time" value={transport.airportArrivalTime} onChange={(e) => setTransport({...transport, airportArrivalTime: e.target.value})} title="Jam" />
+                <div style={{ background: 'rgba(255,255,255,0.7)', padding: '1rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.05)' }}>
+                  <strong style={{ fontSize: '1rem', color: 'var(--primary-color)', display: 'block', marginBottom: '0.75rem' }}>🛬 Kedatangan (Arrival)</strong>
+                  <div className="grid-3">
+                    <div>
+                      <label style={{ fontSize: '0.85rem', color: 'var(--text-light)', marginBottom: '0.25rem' }}>Tanggal</label>
+                      <input type="date" value={transport.airportArrivalDate} onChange={(e) => setTransport({...transport, airportArrivalDate: e.target.value})} />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.85rem', color: 'var(--text-light)', marginBottom: '0.25rem' }}>Bandara (Cth: CGK)</label>
+                      <input type="text" placeholder="Nama bandara..." value={transport.airportArrivalAirport} onChange={(e) => setTransport({...transport, airportArrivalAirport: e.target.value})} />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.85rem', color: 'var(--text-light)', marginBottom: '0.25rem' }}>Jam Tiba</label>
+                      <input type="time" value={transport.airportArrivalTime} onChange={(e) => setTransport({...transport, airportArrivalTime: e.target.value})} />
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <strong style={{ fontSize: '0.9rem' }}>Departure</strong>
-                  <div className="grid-3" style={{ marginTop: '0.5rem' }}>
-                    <input type="date" value={transport.airportDepartureDate} onChange={(e) => setTransport({...transport, airportDepartureDate: e.target.value})} title="Tanggal" />
-                    <input type="text" placeholder="Bandara" value={transport.airportDepartureAirport} onChange={(e) => setTransport({...transport, airportDepartureAirport: e.target.value})} />
-                    <input type="time" value={transport.airportDepartureTime} onChange={(e) => setTransport({...transport, airportDepartureTime: e.target.value})} title="Jam" />
+                <div style={{ background: 'rgba(255,255,255,0.7)', padding: '1rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.05)' }}>
+                  <strong style={{ fontSize: '1rem', color: 'var(--primary-color)', display: 'block', marginBottom: '0.75rem' }}>🛫 Kepulangan (Departure)</strong>
+                  <div className="grid-3">
+                    <div>
+                      <label style={{ fontSize: '0.85rem', color: 'var(--text-light)', marginBottom: '0.25rem' }}>Tanggal</label>
+                      <input type="date" value={transport.airportDepartureDate} onChange={(e) => setTransport({...transport, airportDepartureDate: e.target.value})} />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.85rem', color: 'var(--text-light)', marginBottom: '0.25rem' }}>Bandara (Cth: BDJ)</label>
+                      <input type="text" placeholder="Nama bandara..." value={transport.airportDepartureAirport} onChange={(e) => setTransport({...transport, airportDepartureAirport: e.target.value})} />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.85rem', color: 'var(--text-light)', marginBottom: '0.25rem' }}>Jam Terbang</label>
+                      <input type="time" value={transport.airportDepartureTime} onChange={(e) => setTransport({...transport, airportDepartureTime: e.target.value})} />
+                    </div>
                   </div>
                 </div>
               </div>
