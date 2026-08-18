@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Save, Loader2, Search, AlertCircle, CheckCircle } from 'lucide-react';
 import { saveRequest, verifyNIK } from '../api';
 import { useNavigate } from 'react-router-dom';
+import emailjs from '@emailjs/browser';
 
 const Toast = ({ message, type, onClose }) => {
   useEffect(() => {
@@ -69,6 +70,15 @@ const NewRequest = () => {
   const [nama, setNama] = useState('');
   const [perusahaan, setPerusahaan] = useState('');
   const [departement, setDepartement] = useState('');
+  const [email, setEmail] = useState('');
+  
+  // Hotel Info
+  const [needsHotel, setNeedsHotel] = useState(null);
+  const [orderHotelHelp, setOrderHotelHelp] = useState(null);
+  const [hotelPreferenceName, setHotelPreferenceName] = useState('');
+  const [hotelPreferenceLocation, setHotelPreferenceLocation] = useState('');
+  const [hotelName, setHotelName] = useState('');
+  const [hotelLocation, setHotelLocation] = useState('');
   
   // Visit Info
   const [arrivalDate, setArrivalDate] = useState('');
@@ -130,7 +140,7 @@ const NewRequest = () => {
   const validateForm = () => {
     if (isAGM === null) return { msg: "Harap pilih apakah Anda Karyawan AGM", id: "field-isAGM" };
     if (isAGM && !nik) return { msg: "Harap masukkan NIK", id: "field-nik" };
-    if (!nama || !perusahaan || !departement) return { msg: "Harap lengkapi Data Diri", id: "field-nama" };
+    if (!nama || !perusahaan || !departement || !email) return { msg: "Harap lengkapi Data Diri termasuk Email", id: "field-nama" };
     if (!arrivalDate) return { msg: "Harap isi Arrival Date", id: "field-arrivalDate" };
     if (!departureDate) return { msg: "Harap isi Departure Date", id: "field-departureDate" };
     if (!purpose) return { msg: "Harap isi Purpose of Visit", id: "field-purpose" };
@@ -138,6 +148,16 @@ const NewRequest = () => {
     if (needsMess) {
       if (messDetails.laundry === null || messDetails.meals === null || messDetails.amenities === null) {
         return { msg: "Harap lengkapi opsi Kebutuhan Fasilitas Mess", id: "field-messDetails" };
+      }
+    } else {
+      if (needsHotel === null) return { msg: "Harap pilih apakah Anda menginap di Hotel", id: "field-needsHotel" };
+      if (needsHotel) {
+        if (orderHotelHelp === null) return { msg: "Harap pilih apakah perlu bantuan pemesanan", id: "field-orderHotelHelp" };
+        if (orderHotelHelp) {
+          if (!hotelPreferenceName || !hotelPreferenceLocation) return { msg: "Harap isi preferensi hotel Anda", id: "field-hotelPreference" };
+        } else {
+          if (!hotelName || !hotelLocation) return { msg: "Harap isi detail hotel Anda", id: "field-hotelDetail" };
+        }
       }
     }
     if (safety.shoes && !safety.shoesSize) return { msg: "Harap masukkan ukuran Safety Shoes", id: "field-shoesSize" };
@@ -166,19 +186,42 @@ const NewRequest = () => {
       nama,
       perusahaan,
       departement,
+      email,
       arrivalDate,
       departureDate,
       purpose,
       transport,
       safety,
       needsMess,
-      messDetails: needsMess ? messDetails : null
+      messDetails: needsMess ? messDetails : null,
+      needsHotel: !needsMess ? needsHotel : null,
+      orderHotelHelp: (!needsMess && needsHotel) ? orderHotelHelp : null,
+      hotelPreferenceName: (!needsMess && needsHotel && orderHotelHelp) ? hotelPreferenceName : null,
+      hotelPreferenceLocation: (!needsMess && needsHotel && orderHotelHelp) ? hotelPreferenceLocation : null,
+      hotelName: (!needsMess && needsHotel && !orderHotelHelp) ? hotelName : null,
+      hotelLocation: (!needsMess && needsHotel && !orderHotelHelp) ? hotelLocation : null
     };
 
     try {
       const res = await saveRequest(payload);
       if (res.status === 'success') {
         setSuccessId(res.id);
+
+        try {
+          // You will need to replace these with your actual Service ID, Template ID, and Public Key from EmailJS
+          // e.g., emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams, 'YOUR_PUBLIC_KEY')
+          const templateParams = {
+            to_email: email,
+            cc_email: 'm_haykal@baramultigroup.co.id',
+            request_id: res.id,
+            user_name: nama,
+            company: perusahaan
+          };
+          // UNCOMMENT and SET YOUR KEYS when you have them:
+          // await emailjs.send('service_xxxxx', 'template_xxxxx', templateParams, 'public_xxxxx');
+        } catch (emailErr) {
+          console.error("Gagal mengirim email:", emailErr);
+        }
       } else {
         showToast('Gagal menyimpan: ' + (res.message || 'Unknown error'));
       }
@@ -193,6 +236,12 @@ const NewRequest = () => {
     <div className="glass-card">
       <h2>New SAFARI Request</h2>
       <p>Site Access, Facility & Arrival Request Integration</p>
+
+      <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', margin: '1.5rem 0', borderLeft: '4px solid var(--primary-color)' }}>
+        <p style={{ margin: 0, fontWeight: 'bold', color: 'var(--text-dark)', marginBottom: '0.5rem' }}>Bantuan / Contact Person (HCGA):</p>
+        <p style={{ margin: 0, fontSize: '0.95rem', color: '#475569' }}>📞 +62 813-1891-8707 (Ari Susanto - Sect. Head HCGA)</p>
+        <p style={{ margin: 0, fontSize: '0.95rem', color: '#475569', marginTop: '0.25rem' }}>📞 +62 812-3289-0417 (Kamila Adhiba - Sub Sect. Head)</p>
+      </div>
       
       {toast && (
         <div className="toast-container">
@@ -255,6 +304,10 @@ const NewRequest = () => {
               <div className="form-group" id="field-departement">
                 <label>Departement</label>
                 <input type="text" value={departement} onChange={(e) => setDepartement(e.target.value)} readOnly={isAGM && !isManualAllowed} placeholder="Masukkan Nama Departement" />
+              </div>
+              <div className="form-group" id="field-email">
+                <label>Email (Untuk Notifikasi)</label>
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="contoh@email.com" required />
               </div>
             </>
           )}
@@ -401,6 +454,64 @@ const NewRequest = () => {
                   </label>
                 </div>
               </div>
+            </div>
+          )}
+
+          {needsMess === false && (
+            <div id="field-needsHotel" style={{ paddingLeft: '1.5rem', borderLeft: '4px solid #f59e0b', marginTop: '1.5rem' }}>
+              <div className="form-group">
+                <label>Apakah Anda menginap di Hotel?</label>
+                <div className="radio-group">
+                  <label className="radio-label">
+                    <input type="radio" name="needsHotel" checked={needsHotel === true} onChange={() => setNeedsHotel(true)} /> Yes
+                  </label>
+                  <label className="radio-label">
+                    <input type="radio" name="needsHotel" checked={needsHotel === false} onChange={() => setNeedsHotel(false)} /> No
+                  </label>
+                </div>
+              </div>
+
+              {needsHotel === true && (
+                <div id="field-orderHotelHelp" style={{ paddingLeft: '1.5rem', borderLeft: '4px solid var(--primary-color)', marginTop: '1.5rem' }}>
+                  <div className="form-group">
+                    <label>Apakah perlu bantuan untuk order hotel?</label>
+                    <div className="radio-group">
+                      <label className="radio-label">
+                        <input type="radio" name="orderHotelHelp" checked={orderHotelHelp === true} onChange={() => setOrderHotelHelp(true)} /> Yes (Bantu pesankan)
+                      </label>
+                      <label className="radio-label">
+                        <input type="radio" name="orderHotelHelp" checked={orderHotelHelp === false} onChange={() => setOrderHotelHelp(false)} /> No (Sudah pesan sendiri)
+                      </label>
+                    </div>
+                  </div>
+
+                  {orderHotelHelp === true && (
+                    <div id="field-hotelPreference" style={{ marginTop: '1rem' }}>
+                      <div className="form-group">
+                        <label>Preferensi Nama Hotel</label>
+                        <input type="text" value={hotelPreferenceName} onChange={(e) => setHotelPreferenceName(e.target.value)} placeholder="Contoh: Aston / Swiss-Belhotel" />
+                      </div>
+                      <div className="form-group">
+                        <label>Preferensi Lokasi Hotel</label>
+                        <input type="text" value={hotelPreferenceLocation} onChange={(e) => setHotelPreferenceLocation(e.target.value)} placeholder="Lokasi yang diinginkan" />
+                      </div>
+                    </div>
+                  )}
+
+                  {orderHotelHelp === false && (
+                    <div id="field-hotelDetail" style={{ marginTop: '1rem' }}>
+                      <div className="form-group">
+                        <label>Nama Hotel</label>
+                        <input type="text" value={hotelName} onChange={(e) => setHotelName(e.target.value)} placeholder="Nama hotel yang sudah dipesan" />
+                      </div>
+                      <div className="form-group">
+                        <label>Lokasi Hotel</label>
+                        <input type="text" value={hotelLocation} onChange={(e) => setHotelLocation(e.target.value)} placeholder="Lokasi hotel" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>

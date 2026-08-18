@@ -31,6 +31,7 @@ const DetailModal = ({ request, onClose, onStatusUpdate }) => {
           <div><strong style={{ color: 'var(--text-light)' }}>NIK:</strong><br/>{request.nik}</div>
           <div><strong style={{ color: 'var(--text-light)' }}>Karyawan AGM:</strong><br/>{request.isAGM ? 'Ya' : 'Tidak'}</div>
           <div><strong style={{ color: 'var(--text-light)' }}>Nama:</strong><br/>{request.nama}</div>
+          <div><strong style={{ color: 'var(--text-light)' }}>Email:</strong><br/>{request.email || '-'}</div>
           <div><strong style={{ color: 'var(--text-light)' }}>Perusahaan:</strong><br/>{request.perusahaan}</div>
           <div><strong style={{ color: 'var(--text-light)' }}>Departemen:</strong><br/>{request.departement}</div>
           <div><strong style={{ color: 'var(--text-light)' }}>Arrival Date:</strong><br/>{new Date(request.arrivalDate).toLocaleDateString()}</div>
@@ -59,15 +60,33 @@ const DetailModal = ({ request, onClose, onStatusUpdate }) => {
         </div>
 
         <div style={{ marginBottom: '1.5rem', background: '#f8fafc', padding: '1rem', borderRadius: '8px' }}>
-          <h4 style={{ marginBottom: '0.5rem' }}>Akomodasi Mess</h4>
+          <h4 style={{ marginBottom: '0.5rem' }}>Akomodasi Mess / Hotel</h4>
           {request.needsMess ? (
             <>
+              <div><strong>Kebutuhan Mess:</strong> Ya</div>
               <div>- Laundry: {request.messDetails?.laundry ? 'Ya' : 'Tidak'}</div>
               <div>- Meals: {request.messDetails?.meals ? 'Ya' : 'Tidak'}</div>
               <div>- Amenities: {request.messDetails?.amenities ? 'Ya' : 'Tidak'}</div>
             </>
+          ) : request.needsHotel ? (
+            <>
+              <div><strong>Menginap di Hotel:</strong> Ya</div>
+              {request.orderHotelHelp ? (
+                <>
+                  <div>- Minta tolong pesankan hotel: Ya</div>
+                  <div>- Preferensi Nama: {request.hotelPreferenceName}</div>
+                  <div>- Preferensi Lokasi: {request.hotelPreferenceLocation}</div>
+                </>
+              ) : (
+                <>
+                  <div>- Pesan hotel sendiri: Ya</div>
+                  <div>- Nama Hotel: {request.hotelName}</div>
+                  <div>- Lokasi: {request.hotelLocation}</div>
+                </>
+              )}
+            </>
           ) : (
-            <div>Tidak memerlukan mess</div>
+            <div>Tidak memerlukan mess maupun hotel</div>
           )}
         </div>
 

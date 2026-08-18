@@ -13,6 +13,7 @@ export const saveRequest = async (data) => {
       .insert([
         {
           id: shortId,
+          email: data.email || null,
           is_agm: data.isAGM,
           nik: data.nik || null,
           nama: data.nama,
@@ -32,6 +33,12 @@ export const saveRequest = async (data) => {
           safety_vest: data.safety?.vest || false,
           safety_helm: data.safety?.helm || false,
           needs_mess: data.needsMess || false,
+          needs_hotel: data.needsHotel ?? null,
+          order_hotel_help: data.orderHotelHelp ?? null,
+          hotel_preference_name: data.hotelPreferenceName || null,
+          hotel_preference_location: data.hotelPreferenceLocation || null,
+          hotel_name: data.hotelName || null,
+          hotel_location: data.hotelLocation || null,
           mess_laundry: data.messDetails?.laundry ?? null,
           mess_meals: data.messDetails?.meals ?? null,
           mess_amenities: data.messDetails?.amenities ?? null,
@@ -85,6 +92,7 @@ export const fetchRequests = async () => {
       id: req.id,
       timestamp: req.created_at,
       status: req.status,
+      email: req.email,
       isAGM: req.is_agm,
       nik: req.nik,
       nama: req.nama,
@@ -108,6 +116,12 @@ export const fetchRequests = async () => {
         helm: req.safety_helm
       },
       needsMess: req.needs_mess,
+      needsHotel: req.needs_hotel,
+      orderHotelHelp: req.order_hotel_help,
+      hotelPreferenceName: req.hotel_preference_name,
+      hotelPreferenceLocation: req.hotel_preference_location,
+      hotelName: req.hotel_name,
+      hotelLocation: req.hotel_location,
       messDetails: {
         laundry: req.mess_laundry,
         meals: req.mess_meals,
@@ -141,6 +155,7 @@ export const fetchRequestById = async (id) => {
       id: data.id,
       timestamp: data.created_at,
       status: data.status,
+      email: data.email,
       isAGM: data.is_agm,
       nik: data.nik,
       nama: data.nama,
@@ -164,6 +179,12 @@ export const fetchRequestById = async (id) => {
         helm: data.safety_helm
       },
       needsMess: data.needs_mess,
+      needsHotel: data.needs_hotel,
+      orderHotelHelp: data.order_hotel_help,
+      hotelPreferenceName: data.hotel_preference_name,
+      hotelPreferenceLocation: data.hotel_preference_location,
+      hotelName: data.hotel_name,
+      hotelLocation: data.hotel_location,
       messDetails: {
         laundry: data.mess_laundry,
         meals: data.mess_meals,

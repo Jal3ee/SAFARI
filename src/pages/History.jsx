@@ -78,7 +78,10 @@ const History = () => {
                 <strong>Transport:</strong> {request.transport?.airport ? 'Airport, ' : ''}{request.transport?.site ? 'Site, ' : ''}{request.transport?.returnTransport ? 'Return' : (!request.transport?.airport && !request.transport?.site ? '-' : '')}
               </p>
               <p style={{ fontSize: '0.9rem', marginBottom: '0.25rem' }}>
-                <strong>Mess:</strong> {request.needsMess ? 'Ya' : 'Tidak'}
+                <strong>Mess / Hotel:</strong> {request.needsMess ? 'Mess (Ya)' : request.needsHotel ? 'Hotel (Ya)' : 'Tidak Keduanya'}
+              </p>
+              <p style={{ fontSize: '0.9rem', marginBottom: '0.25rem' }}>
+                <strong>Email:</strong> {request.email || '-'}
               </p>
               <p style={{ fontSize: '0.9rem' }}>
                 <strong>PPE:</strong> {request.safety?.shoes ? 'Shoes, ' : ''}{request.safety?.vest ? 'Vest, ' : ''}{request.safety?.helm ? 'Helm' : (!request.safety?.shoes && !request.safety?.vest ? '-' : '')}
