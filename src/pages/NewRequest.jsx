@@ -227,7 +227,7 @@ const NewRequest = () => {
           const emailPayload = {
             request_id: res.id,
             to_email: email,
-            cc_email: 'm_haykal@baramultigroup.co.id',
+            cc_email: 'm_haykal@baramultigroup.co.id,ari_susanto@baramultigroup.co.id,kamila_adhiba@baramultigroup.co.id,m_majeni@baramultigroup.co.id,ilham_s@baramultigroup.co.id,eldiaz_murlindio@baramultigroup.co.id,aditya_saputra@baramultigroup.co.id,maretrys_virta@baramultigroup.co.id,ahmad_tajali@baramultigroup.co.id,dani@baramultigroup.co.id,saefullah@baramultigroup.co.id',
             nama: nama,
             perusahaan: perusahaan,
             purpose: purpose,
