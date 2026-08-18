@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Save, Loader2, Search, AlertCircle, CheckCircle } from 'lucide-react';
 import { saveRequest, verifyNIK } from '../api';
 import { useNavigate } from 'react-router-dom';
-import emailjs from '@emailjs/browser';
 
 const Toast = ({ message, type, onClose }) => {
   useEffect(() => {
@@ -208,17 +207,27 @@ const NewRequest = () => {
         setSuccessId(res.id);
 
         try {
-          // You will need to replace these with your actual Service ID, Template ID, and Public Key from EmailJS
-          // e.g., emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams, 'YOUR_PUBLIC_KEY')
-          const templateParams = {
-            to_email: email,
-            cc_email: 'm_haykal@baramultigroup.co.id',
-            request_id: res.id,
-            user_name: nama,
-            company: perusahaan
-          };
-          // UNCOMMENT and SET YOUR KEYS when you have them:
-          // await emailjs.send('service_xxxxx', 'template_xxxxx', templateParams, 'public_xxxxx');
+          const emailUrl = import.meta.env.VITE_GAS_EMAIL_URL;
+          if (emailUrl && emailUrl.trim() !== '') {
+            const emailData = {
+              to_email: email,
+              cc_email: 'm_haykal@baramultigroup.co.id',
+              request_id: res.id,
+              user_name: nama,
+              company: perusahaan
+            };
+            
+            // Note: GAS requires text/plain to avoid CORS preflight options issues
+            fetch(emailUrl, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'text/plain;charset=utf-8',
+              },
+              body: JSON.stringify(emailData)
+            }).catch(e => console.error("Error calling GAS:", e));
+          } else {
+            console.log("VITE_GAS_EMAIL_URL belum dikonfigurasi, email notifikasi dilewati.");
+          }
         } catch (emailErr) {
           console.error("Gagal mengirim email:", emailErr);
         }
