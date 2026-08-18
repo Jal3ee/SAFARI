@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchRequests, updateRequestStatus } from '../api';
+import { fetchRequests, updateRequestStatus, importKaryawanBulk } from '../api';
 import { Loader2, Search, Lock, Download, Eye, X } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
@@ -117,6 +117,7 @@ const Admin = () => {
   
   // Filters state (one for each column)
   const [filters, setFilters] = useState({
+    id: '',
     nama: '',
     perusahaan: '',
     departement: '',
@@ -154,6 +155,7 @@ const Admin = () => {
 
   const filteredRequests = requests.filter(req => {
     return (
+      req.id?.toLowerCase().includes(filters.id.toLowerCase()) &&
       req.nama?.toLowerCase().includes(filters.nama.toLowerCase()) &&
       req.perusahaan?.toLowerCase().includes(filters.perusahaan.toLowerCase()) &&
       req.departement?.toLowerCase().includes(filters.departement.toLowerCase()) &&
@@ -165,6 +167,54 @@ const Admin = () => {
   const handleStatusUpdate = (id, newStatus) => {
     setRequests(prev => prev.map(req => req.id === id ? { ...req, status: newStatus } : req));
     setSelectedRequest(null);
+  };
+
+  const handleDownloadTemplate = () => {
+    const templateData = [
+      { nik: '123456', nama: 'Budi Santoso', perusahaan: 'PT. AGM', departement: 'HCGA' },
+      { nik: '789012', nama: 'Siti Aminah', perusahaan: 'PT. AGM', departement: 'IT' }
+    ];
+    const worksheet = XLSX.utils.json_to_sheet(templateData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Template");
+    XLSX.writeFile(workbook, "Template_Karyawan.xlsx");
+  };
+
+  const handleImportExcel = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      try {
+        const bstr = evt.target.result;
+        const workbook = XLSX.read(bstr, { type: 'binary' });
+        const wsname = workbook.SheetNames[0];
+        const ws = workbook.Sheets[wsname];
+        const data = XLSX.utils.sheet_to_json(ws);
+        
+        if (data.length === 0) {
+          alert('File kosong atau format salah.');
+          return;
+        }
+
+        const formattedData = data.map(item => ({
+          nik: String(item.nik),
+          nama: String(item.nama),
+          perusahaan: String(item.perusahaan),
+          departement: String(item.departement)
+        }));
+
+        const result = await importKaryawanBulk(formattedData);
+        if (result.success) {
+          alert(`Berhasil import ${result.count} data karyawan!`);
+        }
+      } catch (err) {
+        alert('Gagal mengimport data: ' + err.message);
+      }
+      e.target.value = null; // reset input
+    };
+    reader.readAsBinaryString(file);
   };
 
   const handleLogin = (e) => {
@@ -252,11 +302,33 @@ const Admin = () => {
           <Download size={18} /> Export Excel
         </button>
       </div>
+
+      <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem', display: 'flex', gap: '1rem', alignItems: 'center', border: '1px solid #e2e8f0' }}>
+        <div>
+          <strong style={{ display: 'block', marginBottom: '0.25rem', color: 'var(--primary-color)' }}>Master Data Karyawan</strong>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-light)' }}>Import data NIK massal agar bisa digenerate otomatis di form.</span>
+        </div>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem' }}>
+          <button className="btn btn-secondary" onClick={handleDownloadTemplate} style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }}>
+            Template
+          </button>
+          <label className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', cursor: 'pointer', margin: 0 }}>
+            Import Excel
+            <input type="file" accept=".xlsx, .xls" onChange={handleImportExcel} style={{ display: 'none' }} />
+          </label>
+        </div>
+      </div>
       
       <div className="table-container">
         <table>
           <thead>
             <tr>
+              <th>
+                ID Request
+                <div style={{ marginTop: '0.5rem' }}>
+                  <input type="text" placeholder="Search..." value={filters.id} onChange={(e) => handleFilterChange('id', e.target.value)} style={{ padding: '0.25rem', fontSize: '0.85rem' }} />
+                </div>
+              </th>
               <th>
                 Name
                 <div style={{ marginTop: '0.5rem' }}>
@@ -300,6 +372,7 @@ const Admin = () => {
             {filteredRequests.length > 0 ? (
               filteredRequests.map(req => (
                 <tr key={req.id}>
+                  <td><strong>{req.id}</strong></td>
                   <td>
                     {req.nama} <br/>
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>NIK: {req.nik}</span>
@@ -330,7 +403,7 @@ const Admin = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="8" style={{ textAlign: 'center', padding: '2rem' }}>No requests found matching criteria</td>
+                <td colSpan="9" style={{ textAlign: 'center', padding: '2rem' }}>No requests found matching criteria</td>
               </tr>
             )}
           </tbody>

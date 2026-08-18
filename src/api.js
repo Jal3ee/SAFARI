@@ -226,3 +226,20 @@ export const verifyNIK = async (nik) => {
     throw new Error('Terjadi kesalahan jaringan saat memverifikasi NIK.');
   }
 };
+
+/**
+ * Insert or upsert bulk Karyawan data
+ */
+export const importKaryawanBulk = async (karyawanData) => {
+  try {
+    const { data, error } = await supabase
+      .from('karyawan')
+      .upsert(karyawanData, { onConflict: 'nik' });
+
+    if (error) throw error;
+    return { success: true, count: karyawanData.length };
+  } catch (error) {
+    console.error('Error importing karyawan:', error);
+    throw new Error('Gagal mengimport data karyawan: ' + error.message);
+  }
+};

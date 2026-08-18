@@ -249,7 +249,7 @@ const NewRequest = () => {
 
   return (
     <div className="glass-card">
-      <h2>New SAFARI Request</h2>
+      <h1 style={{ fontSize: '2.5rem', marginBottom: '0', color: 'var(--primary-color)' }}>SAFARI</h1>
       <p>Site Access, Facility & Arrival Request Integration</p>
 
       <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', margin: '1.5rem 0', borderLeft: '4px solid var(--primary-color)' }}>
