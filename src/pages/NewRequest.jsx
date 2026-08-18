@@ -76,6 +76,7 @@ const NewRequest = () => {
   // Hotel Info
   const [needsHotel, setNeedsHotel] = useState(null);
   const [orderHotelHelp, setOrderHotelHelp] = useState(null);
+  const [hotelPreferenceLocation, setHotelPreferenceLocation] = useState('');
   const [hotelName, setHotelName] = useState('');
   const [hotelLocation, setHotelLocation] = useState('');
   
@@ -161,7 +162,9 @@ const NewRequest = () => {
       if (needsHotel === null) return { msg: "Harap pilih apakah Anda menginap di Hotel", id: "field-needsHotel" };
       if (needsHotel) {
         if (orderHotelHelp === null) return { msg: "Harap pilih apakah perlu bantuan pemesanan", id: "field-orderHotelHelp" };
-        if (!orderHotelHelp) {
+        if (orderHotelHelp) {
+          if (!hotelPreferenceLocation) return { msg: "Harap isi lokasi hotel yang Anda inginkan", id: "field-hotelPreference" };
+        } else {
           if (!hotelName || !hotelLocation) return { msg: "Harap isi detail hotel Anda", id: "field-hotelDetail" };
         }
       }
@@ -211,7 +214,7 @@ const NewRequest = () => {
       needsHotel: !needsMess ? needsHotel : null,
       orderHotelHelp: (!needsMess && needsHotel) ? orderHotelHelp : null,
       hotelPreferenceName: null,
-      hotelPreferenceLocation: null,
+      hotelPreferenceLocation: (!needsMess && needsHotel && orderHotelHelp) ? hotelPreferenceLocation : null,
       hotelName: (!needsMess && needsHotel && !orderHotelHelp) ? hotelName : null,
       hotelLocation: (!needsMess && needsHotel && !orderHotelHelp) ? hotelLocation : null
     };
@@ -529,8 +532,12 @@ const NewRequest = () => {
                   </div>
 
                   {orderHotelHelp === true && (
-                    <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px', borderLeft: '4px solid var(--primary-color)' }}>
-                      <p style={{ margin: 0, fontSize: '0.9rem' }}>✅ Baik, tim GA kami akan menghubungi Anda melalui email atau telepon untuk membantu mencarikan opsi hotel terbaik sesuai ketersediaan.</p>
+                    <div id="field-hotelPreference" style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px', borderLeft: '4px solid var(--primary-color)' }}>
+                      <p style={{ margin: 0, fontSize: '0.9rem', marginBottom: '1rem' }}>✅ Baik, tim GA kami akan menghubungi Anda melalui email atau telepon untuk membantu mencarikan opsi hotel terbaik sesuai ketersediaan.</p>
+                      <div className="form-group" style={{ marginBottom: 0 }}>
+                        <label>Preferensi Lokasi Hotel</label>
+                        <input type="text" value={hotelPreferenceLocation} onChange={(e) => setHotelPreferenceLocation(e.target.value)} placeholder="Contoh: Dekat bandara / Tengah kota" />
+                      </div>
                     </div>
                   )}
 
