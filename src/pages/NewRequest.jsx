@@ -90,8 +90,7 @@ const NewRequest = () => {
     airport: false,
     airportArrivalDate: '', airportArrivalAirport: '', airportArrivalTime: '',
     airportDepartureDate: '', airportDepartureAirport: '', airportDepartureTime: '',
-    site: false, siteNote: '',
-    returnTransport: false, returnNote: ''
+    site: false, siteNote: ''
   });
   
   // Safety
@@ -204,9 +203,7 @@ const NewRequest = () => {
         airport: transport.airport,
         airportNote: transport.airport ? `Arrival: ${transport.airportArrivalDate} ${transport.airportArrivalTime} (${transport.airportArrivalAirport}) | Departure: ${transport.airportDepartureDate} ${transport.airportDepartureTime} (${transport.airportDepartureAirport})` : '',
         site: transport.site,
-        siteNote: transport.siteNote,
-        returnTransport: transport.returnTransport,
-        returnNote: transport.returnNote
+        siteNote: transport.siteNote
       },
       safety,
       needsMess,
@@ -379,12 +376,12 @@ const NewRequest = () => {
           <div className="checkbox-card">
             <label className="checkbox-header" id="field-airport">
               <input type="checkbox" checked={transport.airport} onChange={(e) => setTransport({...transport, airport: e.target.checked})} />
-              <span style={{ fontWeight: 600 }}>Airport Pickup</span>
+              <span style={{ fontWeight: 600 }}>Antar-Jemput Bandara (PP)</span>
             </label>
             {transport.airport && (
               <div className="checkbox-body" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div style={{ background: 'rgba(255,255,255,0.7)', padding: '1rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.05)' }}>
-                  <strong style={{ fontSize: '1rem', color: 'var(--primary-color)', display: 'block', marginBottom: '0.75rem' }}>🛬 Kedatangan (Arrival)</strong>
+                  <strong style={{ fontSize: '1rem', color: 'var(--primary-color)', display: 'block', marginBottom: '0.75rem' }}>🛬 Penjemputan (Kedatangan)</strong>
                   <div className="grid-3">
                     <div>
                       <label style={{ fontSize: '0.85rem', color: 'var(--text-light)', marginBottom: '0.25rem' }}>Tanggal</label>
@@ -401,7 +398,7 @@ const NewRequest = () => {
                   </div>
                 </div>
                 <div style={{ background: 'rgba(255,255,255,0.7)', padding: '1rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.05)' }}>
-                  <strong style={{ fontSize: '1rem', color: 'var(--primary-color)', display: 'block', marginBottom: '0.75rem' }}>🛫 Kepulangan (Departure)</strong>
+                  <strong style={{ fontSize: '1rem', color: 'var(--primary-color)', display: 'block', marginBottom: '0.75rem' }}>🛫 Pengantaran (Kepulangan)</strong>
                   <div className="grid-3">
                     <div>
                       <label style={{ fontSize: '0.85rem', color: 'var(--text-light)', marginBottom: '0.25rem' }}>Tanggal</label>
@@ -429,18 +426,6 @@ const NewRequest = () => {
             {transport.site && (
               <div className="checkbox-body">
                 <input type="text" placeholder="Optional note (e.g. Unit hilux)" value={transport.siteNote} onChange={(e) => setTransport({...transport, siteNote: e.target.value})} />
-              </div>
-            )}
-          </div>
-
-          <div className="checkbox-card">
-            <label className="checkbox-header">
-              <input type="checkbox" checked={transport.returnTransport} onChange={(e) => setTransport({...transport, returnTransport: e.target.checked})} />
-              <span style={{ fontWeight: 600 }}>Return Transport</span>
-            </label>
-            {transport.returnTransport && (
-              <div className="checkbox-body">
-                <input type="text" placeholder="Optional note" value={transport.returnNote} onChange={(e) => setTransport({...transport, returnNote: e.target.value})} />
               </div>
             )}
           </div>
