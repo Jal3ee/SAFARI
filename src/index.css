@@ -85,6 +85,18 @@ p {
   padding: 1.5rem 1rem;
 }
 
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.5rem;
+}
+
 header {
   display: flex;
   justify-content: space-between;
@@ -412,5 +424,9 @@ tr:hover td {
   }
   .toast {
     min-width: 100%;
+  }
+  .grid-2, .grid-3 {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }

@@ -291,7 +291,7 @@ const NewRequest = () => {
           {isAGM === true && (
             <div className="form-group">
               <label>NIK</label>
-              <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <div className="grid-2" style={{ gap: '0.75rem' }}>
                 <input 
                   type="text" 
                   id="field-nik"
@@ -312,7 +312,7 @@ const NewRequest = () => {
                 <label>Nama Lengkap</label>
                 <input type="text" value={nama} onChange={(e) => setNama(e.target.value)} readOnly={isAGM && !isManualAllowed} placeholder="Masukkan Nama Lengkap" />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="grid-2">
                 <div className="form-group" id="field-perusahaan" style={{ marginBottom: 0 }}>
                   <label>Perusahaan</label>
                   <input type="text" value={perusahaan} onChange={(e) => setPerusahaan(e.target.value)} readOnly={isAGM && !isManualAllowed} placeholder="Masukkan Nama Perusahaan" />
@@ -347,7 +347,7 @@ const NewRequest = () => {
         {/* Section 2: Visit Information */}
         <div className="glass-card" style={{ background: 'rgba(255,255,255,0.4)', borderColor: 'rgba(255,255,255,0.9)' }}>
           <h3>2. Visit Information</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1rem' }}>
+          <div className="grid-2" style={{ marginBottom: '1rem' }}>
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label>Arrival Date</label>
               <input type="date" id="field-arrivalDate" value={arrivalDate} onChange={(e) => setArrivalDate(e.target.value)} />
@@ -377,7 +377,7 @@ const NewRequest = () => {
               <div className="checkbox-body" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div>
                   <strong style={{ fontSize: '0.9rem' }}>Arrival</strong>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem', marginTop: '0.5rem' }}>
+                  <div className="grid-3" style={{ marginTop: '0.5rem' }}>
                     <input type="date" value={transport.airportArrivalDate} onChange={(e) => setTransport({...transport, airportArrivalDate: e.target.value})} title="Tanggal" />
                     <input type="text" placeholder="Bandara" value={transport.airportArrivalAirport} onChange={(e) => setTransport({...transport, airportArrivalAirport: e.target.value})} />
                     <input type="time" value={transport.airportArrivalTime} onChange={(e) => setTransport({...transport, airportArrivalTime: e.target.value})} title="Jam" />
@@ -385,7 +385,7 @@ const NewRequest = () => {
                 </div>
                 <div>
                   <strong style={{ fontSize: '0.9rem' }}>Departure</strong>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem', marginTop: '0.5rem' }}>
+                  <div className="grid-3" style={{ marginTop: '0.5rem' }}>
                     <input type="date" value={transport.airportDepartureDate} onChange={(e) => setTransport({...transport, airportDepartureDate: e.target.value})} title="Tanggal" />
                     <input type="text" placeholder="Bandara" value={transport.airportDepartureAirport} onChange={(e) => setTransport({...transport, airportDepartureAirport: e.target.value})} />
                     <input type="time" value={transport.airportDepartureTime} onChange={(e) => setTransport({...transport, airportDepartureTime: e.target.value})} title="Jam" />
