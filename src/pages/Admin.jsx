@@ -32,8 +32,8 @@ const DetailModal = ({ request, onClose, onStatusUpdate }) => {
           <div><strong style={{ color: 'var(--text-light)' }}>Karyawan AGM:</strong><br/>{request.isAGM ? 'Ya' : 'Tidak'}</div>
           <div><strong style={{ color: 'var(--text-light)' }}>Nama:</strong><br/>{request.nama}</div>
           <div><strong style={{ color: 'var(--text-light)' }}>Email:</strong><br/>{request.email || '-'}</div>
-          <div><strong style={{ color: 'var(--text-light)' }}>Perusahaan:</strong><br/>{request.perusahaan}</div>
-          <div><strong style={{ color: 'var(--text-light)' }}>Departemen:</strong><br/>{request.departement}</div>
+          <div><strong style={{ color: 'var(--text-light)' }}>Perusahaan:</strong><br/>{request.perusahaan} {request.statusKerja && `(${request.statusKerja})`}</div>
+          <div><strong style={{ color: 'var(--text-light)' }}>{request.isAGM === false ? 'Job Title' : 'Departemen'}:</strong><br/>{request.departement}</div>
           <div><strong style={{ color: 'var(--text-light)' }}>Arrival Date:</strong><br/>{new Date(request.arrivalDate).toLocaleDateString()}</div>
           <div><strong style={{ color: 'var(--text-light)' }}>Departure Date:</strong><br/>{new Date(request.departureDate).toLocaleDateString()}</div>
         </div>
@@ -270,7 +270,7 @@ const Admin = () => {
                 </div>
               </th>
               <th>
-                Department
+                Department / Job Title
                 <div style={{ marginTop: '0.5rem' }}>
                   <input type="text" placeholder="Search..." value={filters.departement} onChange={(e) => handleFilterChange('departement', e.target.value)} style={{ padding: '0.25rem', fontSize: '0.85rem' }} />
                 </div>
@@ -304,7 +304,7 @@ const Admin = () => {
                     {req.nama} <br/>
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>NIK: {req.nik}</span>
                   </td>
-                  <td>{req.perusahaan}</td>
+                  <td>{req.perusahaan} {req.statusKerja && <><br/><span style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>{req.statusKerja}</span></>}</td>
                   <td>{req.departement}</td>
                   <td>{req.arrivalDate}</td>
                   <td>

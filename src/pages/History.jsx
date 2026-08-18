@@ -55,7 +55,7 @@ const History = () => {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid rgba(0,0,0,0.1)', paddingBottom: '1rem', marginBottom: '1rem' }}>
             <div>
               <h3 style={{ marginBottom: '0.25rem', color: 'var(--text-dark)' }}>{request.nama}</h3>
-              <p style={{ margin: 0 }}>{request.perusahaan} - {request.departement}</p>
+              <p style={{ margin: 0 }}>{request.perusahaan}{request.statusKerja ? ` (${request.statusKerja})` : ''} - {request.departement}</p>
             </div>
             <span className={`badge ${request.status === 'Approved' ? 'badge-green' : request.status === 'Rejected' ? 'badge-red' : 'badge-blue'}`} style={{ fontSize: '1rem' }}>
               {request.status || 'Pending'}

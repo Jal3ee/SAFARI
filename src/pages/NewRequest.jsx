@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Save, Loader2, Search, AlertCircle, CheckCircle } from 'lucide-react';
 import { saveRequest, verifyNIK } from '../api';
 import { useNavigate } from 'react-router-dom';
+import emailjs from '@emailjs/browser';
 
 const Toast = ({ message, type, onClose }) => {
   useEffect(() => {
@@ -70,12 +71,11 @@ const NewRequest = () => {
   const [perusahaan, setPerusahaan] = useState('');
   const [departement, setDepartement] = useState('');
   const [email, setEmail] = useState('');
+  const [statusKerja, setStatusKerja] = useState('');
   
   // Hotel Info
   const [needsHotel, setNeedsHotel] = useState(null);
   const [orderHotelHelp, setOrderHotelHelp] = useState(null);
-  const [hotelPreferenceName, setHotelPreferenceName] = useState('');
-  const [hotelPreferenceLocation, setHotelPreferenceLocation] = useState('');
   const [hotelName, setHotelName] = useState('');
   const [hotelLocation, setHotelLocation] = useState('');
   
@@ -86,7 +86,9 @@ const NewRequest = () => {
   
   // Transport
   const [transport, setTransport] = useState({
-    airport: false, airportNote: '',
+    airport: false,
+    airportArrivalDate: '', airportArrivalAirport: '', airportArrivalTime: '',
+    airportDepartureDate: '', airportDepartureAirport: '', airportDepartureTime: '',
     site: false, siteNote: '',
     returnTransport: false, returnNote: ''
   });
@@ -139,10 +141,17 @@ const NewRequest = () => {
   const validateForm = () => {
     if (isAGM === null) return { msg: "Harap pilih apakah Anda Karyawan AGM", id: "field-isAGM" };
     if (isAGM && !nik) return { msg: "Harap masukkan NIK", id: "field-nik" };
+    if (isAGM === false && !statusKerja) return { msg: "Harap pilih Status Kerja", id: "field-statusKerja" };
     if (!nama || !perusahaan || !departement || !email) return { msg: "Harap lengkapi Data Diri termasuk Email", id: "field-nama" };
     if (!arrivalDate) return { msg: "Harap isi Arrival Date", id: "field-arrivalDate" };
     if (!departureDate) return { msg: "Harap isi Departure Date", id: "field-departureDate" };
     if (!purpose) return { msg: "Harap isi Purpose of Visit", id: "field-purpose" };
+    if (transport.airport) {
+      if (!transport.airportArrivalDate || !transport.airportArrivalAirport || !transport.airportArrivalTime ||
+          !transport.airportDepartureDate || !transport.airportDepartureAirport || !transport.airportDepartureTime) {
+        return { msg: "Harap lengkapi detail Airport Pickup", id: "field-airport" };
+      }
+    }
     if (needsMess === null) return { msg: "Harap pilih apakah memerlukan Mess", id: "field-needsMess" };
     if (needsMess) {
       if (messDetails.laundry === null || messDetails.meals === null || messDetails.amenities === null) {
@@ -152,9 +161,7 @@ const NewRequest = () => {
       if (needsHotel === null) return { msg: "Harap pilih apakah Anda menginap di Hotel", id: "field-needsHotel" };
       if (needsHotel) {
         if (orderHotelHelp === null) return { msg: "Harap pilih apakah perlu bantuan pemesanan", id: "field-orderHotelHelp" };
-        if (orderHotelHelp) {
-          if (!hotelPreferenceName || !hotelPreferenceLocation) return { msg: "Harap isi preferensi hotel Anda", id: "field-hotelPreference" };
-        } else {
+        if (!orderHotelHelp) {
           if (!hotelName || !hotelLocation) return { msg: "Harap isi detail hotel Anda", id: "field-hotelDetail" };
         }
       }
@@ -186,17 +193,25 @@ const NewRequest = () => {
       perusahaan,
       departement,
       email,
+      statusKerja: isAGM === false ? statusKerja : null,
       arrivalDate,
       departureDate,
       purpose,
-      transport,
+      transport: {
+        airport: transport.airport,
+        airportNote: transport.airport ? `Arrival: ${transport.airportArrivalDate} ${transport.airportArrivalTime} (${transport.airportArrivalAirport}) | Departure: ${transport.airportDepartureDate} ${transport.airportDepartureTime} (${transport.airportDepartureAirport})` : '',
+        site: transport.site,
+        siteNote: transport.siteNote,
+        returnTransport: transport.returnTransport,
+        returnNote: transport.returnNote
+      },
       safety,
       needsMess,
       messDetails: needsMess ? messDetails : null,
       needsHotel: !needsMess ? needsHotel : null,
       orderHotelHelp: (!needsMess && needsHotel) ? orderHotelHelp : null,
-      hotelPreferenceName: (!needsMess && needsHotel && orderHotelHelp) ? hotelPreferenceName : null,
-      hotelPreferenceLocation: (!needsMess && needsHotel && orderHotelHelp) ? hotelPreferenceLocation : null,
+      hotelPreferenceName: null,
+      hotelPreferenceLocation: null,
       hotelName: (!needsMess && needsHotel && !orderHotelHelp) ? hotelName : null,
       hotelLocation: (!needsMess && needsHotel && !orderHotelHelp) ? hotelLocation : null
     };
@@ -207,27 +222,15 @@ const NewRequest = () => {
         setSuccessId(res.id);
 
         try {
-          const emailUrl = import.meta.env.VITE_GAS_EMAIL_URL;
-          if (emailUrl && emailUrl.trim() !== '') {
-            const emailData = {
-              to_email: email,
-              cc_email: 'm_haykal@baramultigroup.co.id',
-              request_id: res.id,
-              user_name: nama,
-              company: perusahaan
-            };
-            
-            // Note: GAS requires text/plain to avoid CORS preflight options issues
-            fetch(emailUrl, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'text/plain;charset=utf-8',
-              },
-              body: JSON.stringify(emailData)
-            }).catch(e => console.error("Error calling GAS:", e));
-          } else {
-            console.log("VITE_GAS_EMAIL_URL belum dikonfigurasi, email notifikasi dilewati.");
-          }
+          const templateParams = {
+            to_email: email,
+            cc_email: 'm_haykal@baramultigroup.co.id',
+            request_id: res.id,
+            user_name: nama,
+            company: perusahaan
+          };
+          // UNCOMMENT and SET YOUR KEYS when you have them:
+          // await emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams, 'YOUR_PUBLIC_KEY');
         } catch (emailErr) {
           console.error("Gagal mengirim email:", emailErr);
         }
@@ -247,8 +250,8 @@ const NewRequest = () => {
       <p>Site Access, Facility & Arrival Request Integration</p>
 
       <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', margin: '1.5rem 0', borderLeft: '4px solid var(--primary-color)' }}>
-        <p style={{ margin: 0, fontWeight: 'bold', color: 'var(--text-dark)', marginBottom: '0.5rem' }}>Bantuan / Contact Person (HCGA):</p>
-        <p style={{ margin: 0, fontSize: '0.95rem', color: '#475569' }}>📞 +62 813-1891-8707 (Ari Susanto - Sect. Head HCGA)</p>
+        <p style={{ margin: 0, fontWeight: 'bold', color: 'var(--text-dark)', marginBottom: '0.5rem' }}>Bantuan / Contact Person (GA):</p>
+        <p style={{ margin: 0, fontSize: '0.95rem', color: '#475569' }}>📞 +62 813-1891-8707 (Ari Susanto - Sect. Head GA)</p>
         <p style={{ margin: 0, fontSize: '0.95rem', color: '#475569', marginTop: '0.25rem' }}>📞 +62 812-3289-0417 (Kamila Adhiba - Sub Sect. Head)</p>
       </div>
       
@@ -306,13 +309,29 @@ const NewRequest = () => {
                 <label>Nama Lengkap</label>
                 <input type="text" value={nama} onChange={(e) => setNama(e.target.value)} readOnly={isAGM && !isManualAllowed} placeholder="Masukkan Nama Lengkap" />
               </div>
-              <div className="form-group" id="field-perusahaan">
-                <label>Perusahaan</label>
-                <input type="text" value={perusahaan} onChange={(e) => setPerusahaan(e.target.value)} readOnly={isAGM && !isManualAllowed} placeholder="Masukkan Nama Perusahaan" />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div className="form-group" id="field-perusahaan" style={{ marginBottom: 0 }}>
+                  <label>Perusahaan</label>
+                  <input type="text" value={perusahaan} onChange={(e) => setPerusahaan(e.target.value)} readOnly={isAGM && !isManualAllowed} placeholder="Masukkan Nama Perusahaan" />
+                </div>
+                {isAGM === false && (
+                  <div className="form-group" id="field-statusKerja" style={{ marginBottom: 0 }}>
+                    <label>Status Kerja dengan AGM</label>
+                    <select value={statusKerja} onChange={(e) => setStatusKerja(e.target.value)} style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', width: '100%', outline: 'none' }} required>
+                      <option value="">-- Pilih Status --</option>
+                      <option value="Mitra Kerja">Mitra Kerja</option>
+                      <option value="Vendor">Vendor</option>
+                      <option value="Sub-Kontraktor">Sub-Kontraktor</option>
+                      <option value="Konsultan">Konsultan</option>
+                      <option value="Visitor/Tamu">Visitor/Tamu</option>
+                      <option value="Lainnya">Lainnya</option>
+                    </select>
+                  </div>
+                )}
               </div>
-              <div className="form-group" id="field-departement">
-                <label>Departement</label>
-                <input type="text" value={departement} onChange={(e) => setDepartement(e.target.value)} readOnly={isAGM && !isManualAllowed} placeholder="Masukkan Nama Departement" />
+              <div className="form-group" id="field-departement" style={{ marginTop: '1.5rem' }}>
+                <label>{isAGM === false ? 'Job Title' : 'Departement'}</label>
+                <input type="text" value={departement} onChange={(e) => setDepartement(e.target.value)} readOnly={isAGM && !isManualAllowed} placeholder={`Masukkan ${isAGM === false ? 'Job Title' : 'Departement'}`} />
               </div>
               <div className="form-group" id="field-email">
                 <label>Email (Untuk Notifikasi)</label>
@@ -347,13 +366,28 @@ const NewRequest = () => {
           <p style={{ fontSize: '0.9rem' }}>Pilih opsi transportasi jika dibutuhkan.</p>
           
           <div className="checkbox-card">
-            <label className="checkbox-header">
+            <label className="checkbox-header" id="field-airport">
               <input type="checkbox" checked={transport.airport} onChange={(e) => setTransport({...transport, airport: e.target.checked})} />
               <span style={{ fontWeight: 600 }}>Airport Pickup</span>
             </label>
             {transport.airport && (
-              <div className="checkbox-body">
-                <input type="text" placeholder="Optional note (e.g. Flight GA123, 10:00 AM)" value={transport.airportNote} onChange={(e) => setTransport({...transport, airportNote: e.target.value})} />
+              <div className="checkbox-body" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div>
+                  <strong style={{ fontSize: '0.9rem' }}>Arrival</strong>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem', marginTop: '0.5rem' }}>
+                    <input type="date" value={transport.airportArrivalDate} onChange={(e) => setTransport({...transport, airportArrivalDate: e.target.value})} title="Tanggal" />
+                    <input type="text" placeholder="Bandara" value={transport.airportArrivalAirport} onChange={(e) => setTransport({...transport, airportArrivalAirport: e.target.value})} />
+                    <input type="time" value={transport.airportArrivalTime} onChange={(e) => setTransport({...transport, airportArrivalTime: e.target.value})} title="Jam" />
+                  </div>
+                </div>
+                <div>
+                  <strong style={{ fontSize: '0.9rem' }}>Departure</strong>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem', marginTop: '0.5rem' }}>
+                    <input type="date" value={transport.airportDepartureDate} onChange={(e) => setTransport({...transport, airportDepartureDate: e.target.value})} title="Tanggal" />
+                    <input type="text" placeholder="Bandara" value={transport.airportDepartureAirport} onChange={(e) => setTransport({...transport, airportDepartureAirport: e.target.value})} />
+                    <input type="time" value={transport.airportDepartureTime} onChange={(e) => setTransport({...transport, airportDepartureTime: e.target.value})} title="Jam" />
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -495,15 +529,8 @@ const NewRequest = () => {
                   </div>
 
                   {orderHotelHelp === true && (
-                    <div id="field-hotelPreference" style={{ marginTop: '1rem' }}>
-                      <div className="form-group">
-                        <label>Preferensi Nama Hotel</label>
-                        <input type="text" value={hotelPreferenceName} onChange={(e) => setHotelPreferenceName(e.target.value)} placeholder="Contoh: Aston / Swiss-Belhotel" />
-                      </div>
-                      <div className="form-group">
-                        <label>Preferensi Lokasi Hotel</label>
-                        <input type="text" value={hotelPreferenceLocation} onChange={(e) => setHotelPreferenceLocation(e.target.value)} placeholder="Lokasi yang diinginkan" />
-                      </div>
+                    <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px', borderLeft: '4px solid var(--primary-color)' }}>
+                      <p style={{ margin: 0, fontSize: '0.9rem' }}>✅ Baik, tim GA kami akan menghubungi Anda melalui email atau telepon untuk membantu mencarikan opsi hotel terbaik sesuai ketersediaan.</p>
                     </div>
                   )}
 
