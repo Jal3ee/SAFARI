@@ -249,8 +249,10 @@ const NewRequest = () => {
 
   return (
     <div className="glass-card">
-      <h1 style={{ fontSize: '2.5rem', marginBottom: '0', color: 'var(--primary-color)' }}>SAFARI</h1>
-      <p>Site Access, Facility & Arrival Request Integration</p>
+      <div style={{ textAlign: 'center', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
+        <h1 className="main-title" style={{ fontSize: '2.5rem', marginBottom: '0.25rem', color: 'var(--primary-color)' }}>SAFARI</h1>
+        <p className="main-subtitle" style={{ margin: 0 }}>Site Access, Facility & Arrival Request Integration</p>
+      </div>
 
       <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', margin: '1.5rem 0', borderLeft: '4px solid var(--primary-color)' }}>
         <p style={{ margin: 0, fontWeight: 'bold', color: 'var(--text-dark)', marginBottom: '0.5rem' }}>Bantuan / Contact Person (GA):</p>
