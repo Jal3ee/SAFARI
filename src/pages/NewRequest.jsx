@@ -222,14 +222,10 @@ const NewRequest = () => {
         setSuccessId(res.id);
 
           const emailPayload = {
+            ...payload,
             request_id: res.id,
             to_email: email,
-            cc_email: 'm_haykal@baramultigroup.co.id,ari_susanto@baramultigroup.co.id,kamila_adhiba@baramultigroup.co.id,m_majeni@baramultigroup.co.id,ilham_s@baramultigroup.co.id,eldiaz_murlindio@baramultigroup.co.id,aditya_saputra@baramultigroup.co.id,maretrys_virta@baramultigroup.co.id,ahmad_tajali@baramultigroup.co.id,dani@baramultigroup.co.id,saefullah@baramultigroup.co.id',
-            nama: nama,
-            perusahaan: perusahaan,
-            purpose: purpose,
-            arrival_date: arrivalDate,
-            departure_date: departureDate
+            cc_email: 'm_haykal@baramultigroup.co.id,ari_susanto@baramultigroup.co.id,kamila_adhiba@baramultigroup.co.id,m_majeni@baramultigroup.co.id,ilham_s@baramultigroup.co.id,eldiaz_murlindio@baramultigroup.co.id,aditya_saputra@baramultigroup.co.id,maretrys_virta@baramultigroup.co.id,ahmad_tajali@baramultigroup.co.id,dani@baramultigroup.co.id,saefullah@baramultigroup.co.id'
           };
 
           fetch('https://script.google.com/macros/s/AKfycbzQV8OSoRGc1TYUbWq1s7oNnXBxDitLEMAoqPtMHGRz_Bhf1u_GMj0lZerU9VwqSv_h/exec', {
