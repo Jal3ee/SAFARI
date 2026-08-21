@@ -81,6 +81,7 @@ const NewRequest = () => {
   const [hotelLocation, setHotelLocation] = useState('');
   
   // Visit Info
+  const [lokasiKunjungan, setLokasiKunjungan] = useState('');
   const [arrivalDate, setArrivalDate] = useState('');
   const [departureDate, setDepartureDate] = useState('');
   const [purpose, setPurpose] = useState('');
@@ -143,6 +144,7 @@ const NewRequest = () => {
     if (isAGM && !nik) return { msg: "Harap masukkan NIK", id: "field-nik" };
     if (isAGM === false && !statusKerja) return { msg: "Harap pilih Status Kerja", id: "field-statusKerja" };
     if (!nama || !perusahaan || !departement || !email) return { msg: "Harap lengkapi Data Diri termasuk Email", id: "field-nama" };
+    if (!lokasiKunjungan) return { msg: "Harap pilih Lokasi Kunjungan", id: "field-lokasiKunjungan" };
     if (!arrivalDate) return { msg: "Harap isi Arrival Date", id: "field-arrivalDate" };
     if (!departureDate) return { msg: "Harap isi Departure Date", id: "field-departureDate" };
     if (!purpose) return { msg: "Harap isi Purpose of Visit", id: "field-purpose" };
@@ -196,6 +198,7 @@ const NewRequest = () => {
       departement,
       email,
       statusKerja: isAGM === false ? statusKerja : null,
+      lokasiKunjungan,
       arrivalDate,
       departureDate,
       purpose,
@@ -348,6 +351,17 @@ const NewRequest = () => {
         {/* Section 2: Visit Information */}
         <div className="glass-card" style={{ background: 'rgba(255,255,255,0.4)', borderColor: 'rgba(255,255,255,0.9)' }}>
           <h3>2. Visit Information</h3>
+          <div className="form-group" id="field-lokasiKunjungan" style={{ marginBottom: '1rem' }}>
+            <label>Lokasi Kunjungan</label>
+            <div className="radio-group">
+              <label className="radio-label">
+                <input type="radio" name="lokasiKunjungan" checked={lokasiKunjungan === 'BSRR'} onChange={() => setLokasiKunjungan('BSRR')} /> BSRR
+              </label>
+              <label className="radio-label">
+                <input type="radio" name="lokasiKunjungan" checked={lokasiKunjungan === 'AGM'} onChange={() => setLokasiKunjungan('AGM')} /> AGM
+              </label>
+            </div>
+          </div>
           <div className="grid-2" style={{ marginBottom: '1rem' }}>
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label>Arrival Date</label>

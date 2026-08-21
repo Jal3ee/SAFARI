@@ -11,6 +11,7 @@ const Navbar = () => {
   return (
     <header className="glass-container">
       <div className="logos">
+        <img src="/logo_baramulti.png" alt="Baramulti Logo" className="logo-img" />
         <img src="/agm-logo.png" alt="AGM Logo" className="logo-img" />
         <img src="/hcga-logo.png" alt="HCGA Logo" className="logo-img" />
       </div>

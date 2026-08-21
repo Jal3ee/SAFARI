@@ -23,6 +23,7 @@ export const saveRequest = async (data) => {
           arrival_date: data.arrivalDate,
           departure_date: data.departureDate,
           purpose: data.purpose,
+          lokasi_kunjungan: data.lokasiKunjungan,
           transport_airport: data.transport?.airport || false,
           transport_airport_note: data.transport?.airportNote || null,
           transport_site: data.transport?.site || false,
@@ -103,6 +104,7 @@ export const fetchRequests = async () => {
       arrivalDate: req.arrival_date,
       departureDate: req.departure_date,
       purpose: req.purpose,
+      lokasiKunjungan: req.lokasi_kunjungan,
       transport: {
         airport: req.transport_airport,
         airportNote: req.transport_airport_note,
@@ -167,6 +169,7 @@ export const fetchRequestById = async (id) => {
       arrivalDate: data.arrival_date,
       departureDate: data.departure_date,
       purpose: data.purpose,
+      lokasiKunjungan: data.lokasi_kunjungan,
       transport: {
         airport: data.transport_airport,
         airportNote: data.transport_airport_note,
